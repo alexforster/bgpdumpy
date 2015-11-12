@@ -1,5 +1,10 @@
 *.py[oc]
 env
+deps
+lib
+!deps/zlib-1.2.8.tar.gz
+!deps/bzip2-1.0.6.tar.gz
+!deps/libbgpdump-1.4.99.15.tar.gz
 
 # JetBrains
 .idea

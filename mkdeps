@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+#
+# Usage: ./mkdeps [clean]
+#
+
+ZLIB=zlib-1.2.8.tar.gz
+LIBBZIP2=bzip2-1.0.6.tar.gz
+LIBBGPDUMP=libbgpdump-1.4.99.15.tar.gz
+
+BASEDIR=$( cd -P -- "$(dirname -- "$(command -v -- "$0")")" && pwd -P )
+
+rm -rf "$BASEDIR/deps/${ZLIB::${#ZLIB}-7}" > /dev/null 2>&1
+rm -rf "$BASEDIR/deps/${LIBBZIP2::${#LIBBZIP2}-7}" > /dev/null 2>&1
+rm -rf "$BASEDIR/deps/${LIBBGPDUMP::${#LIBBGPDUMP}-7}" > /dev/null 2>&1
+rm -rf "$BASEDIR/lib/libbgpdump.so" > /dev/null 2>&1
+
+[[ $1 == 'clean' ]] && exit
+
+tar xf "$BASEDIR/deps/$ZLIB" -C "$BASEDIR/deps/"
+tar xf "$BASEDIR/deps/$LIBBZIP2" -C "$BASEDIR/deps/"
+tar xf "$BASEDIR/deps/$LIBBGPDUMP" -C "$BASEDIR/deps/"
+
+cd "$BASEDIR/deps/${ZLIB::${#ZLIB}-7}"
+./configure --static
+make
+cd - > /dev/null 2>&1
+
+cd "$BASEDIR/deps/${LIBBZIP2::${#LIBBZIP2}-7}"
+make bzip2
+cd - > /dev/null 2>&1
+
+cd "$BASEDIR/deps/${LIBBGPDUMP::${#LIBBGPDUMP}-7}"
+make SYS_LIBS="-I../zlib-1.2.8 -L../zlib-1.2.8 -I../bzip2-1.0.6 -L../bzip2-1.0.6 -lz -lbz2"
+cd - > /dev/null 2>&1
+
+mkdir "$BASEDIR/lib" > /dev/null 2>&1
+cp -f "$BASEDIR/deps/${LIBBGPDUMP::${#LIBBGPDUMP}-7}/libbgpdump.so" "$BASEDIR/lib"
