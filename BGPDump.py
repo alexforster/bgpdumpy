@@ -6,6 +6,9 @@
 # See the LICENSE file for details.
 ########################################################################################################################
 
+import os
+
+from pkg_resources import resource_filename
 from socket import inet_ntop, AF_INET, AF_INET6
 from datetime import datetime
 from cffi import FFI
@@ -360,8 +363,10 @@ class BGPDump:
 
         self.ffi = FFI()
 
+        libdir = resource_filename( 'bgpdumpy', 'lib' ) or ''
+
         self.libc = self.ffi.dlopen(None)
-        self.libbgpdump = self.ffi.dlopen('lib/libbgpdump.so')
+        self.libbgpdump = self.ffi.dlopen( os.path.join( libdir, 'libbgpdump.so' ) )
 
         self.ffi.cdef(CTypes)
 
