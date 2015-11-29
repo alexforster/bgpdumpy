@@ -353,7 +353,7 @@ class BGPDump:
 
     def __init__(self, filename):
 
-        self.filename = filename
+        self.filename =  str(filename) if isinstance( filename, unicode ) else filename
         self.ffi = None
         self.libc = None
         self.libbgpdump = None
