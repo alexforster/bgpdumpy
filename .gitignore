@@ -1,5 +1,4 @@
 *.py[oc]
-env
 deps
 lib
 !deps/zlib-1.2.8.tar.gz

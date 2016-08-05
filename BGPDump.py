@@ -37,7 +37,7 @@ class BGPAttributes:
     @property
     def nexthop(self):
 
-        return inet_ntop(AF_INET, self.bgp.ffi.buffer(self.bgp.ffi.addressof(self.attributes.nexthop)))
+        return inet_ntop(AF_INET, self.bgp.ffi.buffer(self.bgp.ffi.addressof(self.attributes.nexthop))[:])
 
     @property
     def med(self):
@@ -57,7 +57,7 @@ class BGPAttributes:
     @property
     def aggregatorAddr(self):
 
-        return inet_ntop(AF_INET, self.bgp.ffi.buffer(self.bgp.ffi.addressof(self.attributes.aggregator_addr)))
+        return inet_ntop(AF_INET, self.bgp.ffi.buffer(self.bgp.ffi.addressof(self.attributes.aggregator_addr))[:])
 
     @property
     def weight(self):
@@ -67,7 +67,7 @@ class BGPAttributes:
     @property
     def originatorID(self):
 
-        return inet_ntop(AF_INET, self.bgp.ffi.buffer(self.bgp.ffi.addressof(self.attributes.originator_id)))
+        return inet_ntop(AF_INET, self.bgp.ffi.buffer(self.bgp.ffi.addressof(self.attributes.originator_id))[:])
 
     @property
     def cluster(self):
@@ -76,7 +76,7 @@ class BGPAttributes:
         self._cluster = []
         for i in range(0, self.attributes.cluster.length):
             self._cluster.append(
-                inet_ntop(AF_INET, self.bgp.ffi.buffer(self.bgp.ffi.addressof(self.attributes.cluster.list[i]))))
+                inet_ntop(AF_INET, self.bgp.ffi.buffer(self.bgp.ffi.addressof(self.attributes.cluster.list[i]))[:]))
         return self._cluster
 
     @property
@@ -157,11 +157,11 @@ class TableDumpV1:
 
         if self.subtype == CConst.BGPDUMP_SUBTYPE_MRTD_TABLE_DUMP_AFI_IP \
         or self.subtype == CConst.BGPDUMP_SUBTYPE_MRTD_TABLE_DUMP_AFI_IP_32BIT_AS:
-            return inet_ntop(AF_INET, self.bgp.ffi.buffer(self.bgp.ffi.addressof(self.body.prefix.v4_addr)))
+            return inet_ntop(AF_INET, self.bgp.ffi.buffer(self.bgp.ffi.addressof(self.body.prefix.v4_addr))[:])
 
         if self.subtype == CConst.BGPDUMP_SUBTYPE_MRTD_TABLE_DUMP_AFI_IP6 \
         or self.subtype == CConst.BGPDUMP_SUBTYPE_MRTD_TABLE_DUMP_AFI_IP6_32BIT_AS:
-            return inet_ntop(AF_INET6, self.bgp.ffi.buffer(self.bgp.ffi.addressof(self.body.prefix.v6_addr)))
+            return inet_ntop(AF_INET6, self.bgp.ffi.buffer(self.bgp.ffi.addressof(self.body.prefix.v6_addr))[:])
 
     @property
     def mask(self):
@@ -183,11 +183,11 @@ class TableDumpV1:
 
         if self.subtype == CConst.BGPDUMP_SUBTYPE_MRTD_TABLE_DUMP_AFI_IP \
         or self.subtype == CConst.BGPDUMP_SUBTYPE_MRTD_TABLE_DUMP_AFI_IP_32BIT_AS:
-            return inet_ntop(AF_INET, self.bgp.ffi.buffer(self.bgp.ffi.addressof(self.body.prefix.v4_addr)))
+            return inet_ntop(AF_INET, self.bgp.ffi.buffer(self.bgp.ffi.addressof(self.body.prefix.v4_addr))[:])
 
         if self.subtype == CConst.BGPDUMP_SUBTYPE_MRTD_TABLE_DUMP_AFI_IP6 \
         or self.subtype == CConst.BGPDUMP_SUBTYPE_MRTD_TABLE_DUMP_AFI_IP6_32BIT_AS:
-            return inet_ntop(AF_INET6, self.bgp.ffi.buffer(self.bgp.ffi.addressof(self.body.prefix.v6_addr)))
+            return inet_ntop(AF_INET6, self.bgp.ffi.buffer(self.bgp.ffi.addressof(self.body.prefix.v6_addr))[:])
 
     @property
     def peerAS(self):
@@ -292,10 +292,10 @@ class TableDumpV2:
     def prefix(self):
 
         if self.afi == AF_INET:
-            return inet_ntop(AF_INET, self.bgp.ffi.buffer(self.bgp.ffi.addressof(self.body.prefix.v4_addr)))
+            return inet_ntop(AF_INET, self.bgp.ffi.buffer(self.bgp.ffi.addressof(self.body.prefix.v4_addr))[:])
 
         if self.afi == AF_INET6:
-            return inet_ntop(AF_INET6, self.bgp.ffi.buffer(self.bgp.ffi.addressof(self.body.prefix.v6_addr)))
+            return inet_ntop(AF_INET6, self.bgp.ffi.buffer(self.bgp.ffi.addressof(self.body.prefix.v6_addr))[:])
 
     @property
     def routeEntries(self):

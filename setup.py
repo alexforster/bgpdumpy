@@ -14,7 +14,7 @@ from setuptools.command.install_lib import install_lib as install_lib
 from subprocess import check_call
 
 PACKAGE_NAME = 'bgpdumpy'
-PACKAGE_VERSION = '1.0.0'
+PACKAGE_VERSION = '1.0.1'
 
 class custom_install_lib(install_lib):
 
