@@ -8,7 +8,7 @@
 
 ```python
 import re
-from bgpdumpy import BGPDump
+from bgpdumpy import BGPDump, TableDumpV2
 
 with BGPDump( 'latest-bview.gz' ) as bgp:
 
