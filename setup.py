@@ -22,7 +22,7 @@ class custom_install_lib(install_lib):
 
         install_lib.run(self)
 
-        cwd = os.path.join( os.getcwdu(), self.install_dir )
+        cwd = os.path.join( os.getcwd(), self.install_dir )
         cwd = os.path.join( cwd, PACKAGE_NAME )
 
         print( 'Running mkdeps in ' + cwd )
