@@ -82,19 +82,17 @@ class BGPAttributes:
     @property
     def asPath(self):
 
-        return self.bgp.ffi.string(self.attributes.aspath.str) if self.attributes.aspath != self.bgp.ffi.NULL else None
+        return self.bgp.ffi.string(self.attributes.aspath.str).decode() if self.attributes.aspath != self.bgp.ffi.NULL else None
 
     @property
     def community(self):
 
-        return self.bgp.ffi.string(
-            self.attributes.community.str) if self.attributes.community != self.bgp.ffi.NULL else None
+        return self.bgp.ffi.string(self.attributes.community.str).decode() if self.attributes.community != self.bgp.ffi.NULL else None
 
     @property
     def ecommunity(self):
 
-        return self.bgp.ffi.string(
-            self.attributes.ecommunity.str) if self.attributes.ecommunity != self.bgp.ffi.NULL else None
+        return self.bgp.ffi.string(self.attributes.ecommunity.str).decode() if self.attributes.ecommunity != self.bgp.ffi.NULL else None
 
     @property
     def transit(self):
@@ -104,14 +102,12 @@ class BGPAttributes:
     @property
     def newASPath(self):
 
-        return self.bgp.ffi.string(
-            self.attributes.new_aspath.str) if self.attributes.new_aspath != self.bgp.ffi.NULL else None
+        return self.bgp.ffi.string(self.attributes.new_aspath.str).decode() if self.attributes.new_aspath != self.bgp.ffi.NULL else None
 
     @property
     def oldASPath(self):
 
-        return self.bgp.ffi.string(
-            self.attributes.old_aspath.str) if self.attributes.old_aspath != self.bgp.ffi.NULL else None
+        return self.bgp.ffi.string(self.attributes.old_aspath.str).decode() if self.attributes.old_aspath != self.bgp.ffi.NULL else None
 
     @property
     def newAggregatorAS(self):
@@ -345,9 +341,10 @@ class BGPEntry:
 
 class BGPDump:
 
-    def __init__(self, filename):
+    def __init__(self, filename, libbgpdump_path=None):
 
         self.filename = filename
+        self.libbgpdump_path = libbgpdump_path
         self.ffi = None
         self.libc = None
         self.libbgpdump = None
@@ -360,11 +357,14 @@ class BGPDump:
         libdir = resource_filename('bgpdumpy', 'lib') or ''
 
         self.libc = self.ffi.dlopen(None)
-        self.libbgpdump = self.ffi.dlopen(os.path.join(libdir, 'libbgpdump.so'))
+        if self.libbgpdump_path is not None:
+            self.libbgpdump = self.ffi.dlopen(os.path.abspath(os.path.expanduser(self.libbgpdump_path)))
+        else:
+            self.libbgpdump = self.ffi.dlopen(os.path.join(libdir, 'libbgpdump.so'))
 
         self.ffi.cdef(CTypes)
 
-        self.handle = self.libbgpdump.bgpdump_open_dump(self.filename)
+        self.handle = self.libbgpdump.bgpdump_open_dump(str(self.filename).encode())
 
         return self
 
@@ -399,4 +399,4 @@ class BGPDump:
     @property
     def version(self):
 
-        return self.ffi.string(self.libbgpdump.bgpdump_version())
+        return self.ffi.string(self.libbgpdump.bgpdump_version()).decode()
