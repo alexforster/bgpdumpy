@@ -1,34 +1,33 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 ########################################################################################################################
-# Copyright © 2015 Alex Forster. All rights reserved.
+# Copyright © 2019 Alex Forster. All rights reserved.
 # This software is licensed under the 3-Clause ("New") BSD license.
 # See the LICENSE file for details.
 ########################################################################################################################
 
 import os
+from subprocess import check_call
 
 from setuptools import setup
 from setuptools.command.install_lib import install_lib as install_lib
 
-from subprocess import check_call
-
 PACKAGE_NAME = 'bgpdumpy'
 PACKAGE_VERSION = '1.0.1'
+
 
 class custom_install_lib(install_lib):
 
     def run(self):
-
         install_lib.run(self)
 
-        cwd = os.path.join( os.getcwd(), self.install_dir )
-        cwd = os.path.join( cwd, PACKAGE_NAME )
+        cwd = os.path.join(os.getcwd(), self.install_dir)
+        cwd = os.path.join(cwd, PACKAGE_NAME)
 
-        print( 'Running mkdeps in ' + cwd )
+        print('Running mkdeps in ' + cwd)
 
-        check_call( [os.path.join( cwd, 'mkdeps' )], cwd=cwd )
-        check_call( [os.path.join( cwd, 'mkdeps' ), 'clean'], cwd=cwd )
+        check_call([os.path.join(cwd, 'mkdeps')], cwd=cwd)
+        check_call([os.path.join(cwd, 'mkdeps'), 'clean'], cwd=cwd)
+
 
 setup(
     name=PACKAGE_NAME,

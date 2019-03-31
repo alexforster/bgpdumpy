@@ -1,7 +1,6 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 ########################################################################################################################
-# Copyright © 2015 Alex Forster. All rights reserved.
+# Copyright © 2019 Alex Forster. All rights reserved.
 # This software is licensed under the 3-Clause ("New") BSD license.
 # See the LICENSE file for details.
 ########################################################################################################################
@@ -479,8 +478,8 @@ void	bgpdump_free_mem(BGPDUMP_ENTRY *entry);
 char *bgpdump_version(void);
 '''
 
-class CConst:
 
+class CConst:
     # type and subtypes values - defined in RFC6396
     BGPDUMP_TYPE_MRTD_BGP = 5
     BGPDUMP_SUBTYPE_MRTD_BGP_NULL = 0
@@ -528,7 +527,7 @@ class CConst:
     BGP_STATE_ESTABLISHED = 6
 
     # BGP message types */
-    BGP_MSG_OPEN =  1
+    BGP_MSG_OPEN = 1
     BGP_MSG_UPDATE = 2
     BGP_MSG_NOTIFY = 3
     BGP_MSG_KEEPALIVE = 4
@@ -562,7 +561,7 @@ class CConst:
     BGP_ATTR_NEW_AGGREGATOR = 18
 
     # Flag macro
-    ATTR_FLAG_BIT = lambda(X): (1 << ((X) - 1))
+    ATTR_FLAG_BIT = lambda X: (1 << ((X) - 1))
 
     # BGP ASPATH attribute defines
     AS_HEADER_SIZE = 2
@@ -579,7 +578,7 @@ class CConst:
     COMMUNITY_NO_EXPORT_SUBCONFED = 0xFFFFFF03
     COMMUNITY_LOCAL_AS = 0xFFFFFF03
 
-    COM_NTHVAL = lambda(X,n): (X.val + (n))
+    COM_NTHVAL = lambda X, n: (X.val + (n))
 
     # MP-BGP address families
     AFI_IP = 1
