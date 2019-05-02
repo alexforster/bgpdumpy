@@ -5,4 +5,4 @@
 # See the LICENSE file for details.
 ########################################################################################################################
 
-from BGPDump import BGPDump, TableDumpV1, TableDumpV2
+from .BGPDump import BGPDump, TableDumpV1, TableDumpV2
