@@ -12,7 +12,7 @@ from socket import inet_ntop, AF_INET, AF_INET6
 from cffi import FFI
 from pkg_resources import resource_filename
 
-from CDefs import CTypes, CConst
+from .CDefs import CTypes, CConst
 
 
 class BGPAttributes:
