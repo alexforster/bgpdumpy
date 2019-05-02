@@ -3,33 +3,45 @@
 ### Overview
 
 `bgpdumpy` is a [libbgpdump](https://bitbucket.org/ripencc/bgpdump) Python CFFI wrapper for analyzing MRT and MRTv2 BGP table dump files.
- 
+
+### Build Requirements
+
+#### Debian/Ubuntu
+
+ * `ca-certificates`
+ * `gcc`
+ * `make`
+ * `autoconf`
+ * `python-setuptools`
+ * `python-dev`
+ * `libbz2-dev`
+ * `zlib1g-dev`
+ * `libffi-dev`
+
 ### Example
 
 ```python
 import re
 from bgpdumpy import BGPDump, TableDumpV2
 
-with BGPDump( 'latest-bview.gz' ) as bgp:
-
+with BGPDump('latest-bview.gz') as bgp:
     for entry in bgp:
-    
+
         # entry.body can be either be TableDumpV1 or TableDumpV2
-        
-        if not isinstance( entry.body, TableDumpV2 ):
+        if not isinstance(entry.body, TableDumpV2):
             continue  # I expect an MRT v2 table dump file
-        
+
         # get a string representation of this prefix
-        prefix = '%s/%d' %( entry.body.prefix, entry.body.prefixLength )
-        
+        prefix = '%s/%d' % (entry.body.prefix, entry.body.prefixLength)
+
         # get a list of each unique originating ASN for this prefix
-        originatingASs = set( [
-            re.split( r'\s+', route.attr.asPath )[-1]
+        originatingASs = set([
+            re.split(r'\s+', route.attr.asPath)[-1]
             for route
-            in entry.body.routeEntries] )
-        
+            in entry.body.routeEntries])
+
         # just print it for demonstration purposes
-        print( '%s -> %s' %( prefix, '/'.join( originatingASs ) ) )
+        print('%s -> %s' % (prefix, '/'.join(originatingASs)))
         
 # 1.0.0.0/24 -> 15169
 # 1.0.4.0/24 -> 56203

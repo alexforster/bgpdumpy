@@ -1,7 +1,6 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 ########################################################################################################################
-# Copyright © 2015 Alex Forster. All rights reserved.
+# Copyright © 2019 Alex Forster. All rights reserved.
 # This software is licensed under the 3-Clause ("New") BSD license.
 # See the LICENSE file for details.
 ########################################################################################################################
@@ -32,7 +31,7 @@ struct in6_addr
     in6_u;
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cfile_tools.h //////////////////////////////////////////////////////////////
 
 struct _CFRFILE {
     int format;       // 0 = not open, 1 = uncompressed, 2 = bzip2, 3 = gzip
@@ -48,6 +47,8 @@ struct _CFRFILE {
 };
 
 typedef struct _CFRFILE CFRFILE;
+
+// bgpdump_attr.h /////////////////////////////////////////////////////////////
 
 /* BGP Attribute flags. */
 #define BGP_ATTR_FLAG_OPTIONAL  0x80	/* Attribute is optional. */
@@ -74,6 +75,7 @@ typedef struct _CFRFILE CFRFILE;
 #define BGP_ATTR_EXT_COMMUNITIES          16
 #define BGP_ATTR_NEW_AS_PATH              17
 #define BGP_ATTR_NEW_AGGREGATOR           18
+#define BGP_ATTR_LARGE_COMMUNITIES        32
 
 /* Flag macro */
 //#define ATTR_FLAG_BIT(X)  (1 << ((X) - 1))
@@ -102,9 +104,14 @@ typedef struct _CFRFILE CFRFILE;
 //#define com_nthval(X,n)  ((X)->val + (n))
 
 /* MP-BGP address families */
+//#ifdef BGPDUMP_HAVE_IPV6
 #define AFI_IP 1
 #define AFI_IP6 2
 #define BGPDUMP_MAX_AFI 2
+//#else
+//#define AFI_IP 1
+//#define BGPDUMP_MAX_AFI AFI_IP
+//#endif
 
 #define SAFI_UNICAST		1
 #define SAFI_MULTICAST		2
@@ -120,6 +127,7 @@ struct unknown_attr
 };
 
 typedef u_int32_t as_t;
+typedef u_int32_t pathid_t;
 
 typedef struct attr attributes_t;
 struct attr
@@ -141,6 +149,7 @@ struct attr
     struct aspath 	*aspath;
     struct community 	*community;
     struct ecommunity 	*ecommunity;
+    struct lcommunity   *lcommunity;
     struct transit 	*transit;
 
     /* libbgpdump additions */
@@ -166,6 +175,13 @@ struct community
     int 			size;
     u_int32_t 		*val;
     char			*str;
+};
+
+struct lcommunity
+{
+    int       size;
+    u_int32_t *val;
+    char      *str;
 };
 
 struct cluster_list
@@ -203,7 +219,7 @@ struct mp_info {
 };
 
 //#ifdef BGPDUMP_HAVE_IPV6
-//m)->announce[AFI_IP6][SAFI_UNICAST])
+//#define MP_IPV6_ANNOUNCE(m) ((m)->announce[AFI_IP6][SAFI_UNICAST])
 //#define MP_IPV6_WITHDRAW(m) ((m)->withdraw[AFI_IP6][SAFI_UNICAST])
 //#endif
 
@@ -222,6 +238,7 @@ typedef union union_BGPDUMP_IP_ADDRESS {
 struct prefix {
     BGPDUMP_IP_ADDRESS	address;
     u_char		len;
+    pathid_t    path_id;
 };
 
 #define MAX_PREFIXES 2050
@@ -234,6 +251,8 @@ struct mp_nlri {
     u_int16_t		prefix_count;
     struct prefix		nlri[MAX_PREFIXES];
 };
+
+// bgpdump_formats.h //////////////////////////////////////////////////////////
 
 /* type and subtypes values */
 /* RFC6396 */
@@ -269,12 +288,26 @@ struct mp_nlri {
 
 /* Zebra record types */
 #define BGPDUMP_TYPE_ZEBRA_BGP			16 /* MSG_PROTOCOL_BGP4MP */
+#define BGPDUMP_TYPE_ZEBRA_BGP_ET       17 /* MSG_PROTOCOL_BGP4MP_ET */
 #define BGPDUMP_SUBTYPE_ZEBRA_BGP_STATE_CHANGE	0  /* BGP4MP_STATE_CHANGE */
 #define BGPDUMP_SUBTYPE_ZEBRA_BGP_MESSAGE	1  /* BGP4MP_MESSAGE */
 #define BGPDUMP_SUBTYPE_ZEBRA_BGP_ENTRY		2  /* BGP4MP_ENTRY */
 #define BGPDUMP_SUBTYPE_ZEBRA_BGP_SNAPSHOT	3  /* BGP4MP_SNAPSHOT */
 #define BGPDUMP_SUBTYPE_ZEBRA_BGP_MESSAGE_AS4	4  /* BGP4MP_MESSAGE_AS4 */
 #define BGPDUMP_SUBTYPE_ZEBRA_BGP_STATE_CHANGE_AS4	5  /* BGP4MP_STATE_CHANGE_AS4 */
+#define BGPDUMP_SUBTYPE_ZEBRA_BGP_MESSAGE_LOCAL	6  /* BGP4MP_MESSAGE_LOCAL */
+#define BGPDUMP_SUBTYPE_ZEBRA_BGP_MESSAGE_AS4_LOCAL	7  /* BGP4MP_MESSAGE_AS4_LOCAL */
+
+/* RFC8050 add-path extensions */
+#define BGPDUMP_SUBTYPE_ZEBRA_BGP_MESSAGE_ADDPATH            8   /* BGP4MP_MESSAGE_ADDPATH */
+#define BGPDUMP_SUBTYPE_ZEBRA_BGP_MESSAGE_AS4_ADDPATH        9   /* BGP4MP_MESSAGE_AS4_ADDPATH */
+#define BGPDUMP_SUBTYPE_ZEBRA_BGP_MESSAGE_LOCAL_ADDPATH      10  /* BGP4MP_MESSAGE_LOCAL_ADDPATH */
+#define BGPDUMP_SUBTYPE_ZEBRA_BGP_MESSAGE_AS4_LOCAL_ADDPATH  11  /* BGP4MP_MESSAGE_AS4_LOCAL */
+#define BGPDUMP_SUBTYPE_TABLE_DUMP_V2_RIB_IPV4_UNICAST_ADDPATH    8    /* RIB_IPV4_UNICAST_ADDPATH */
+#define BGPDUMP_SUBTYPE_TABLE_DUMP_V2_RIB_IPV4_MULTICAST_ADDPATH  9    /* RIB_IPV4_MULTICAST_ADDPATH */
+#define BGPDUMP_SUBTYPE_TABLE_DUMP_V2_RIB_IPV6_UNICAST_ADDPATH    10   /* RIB_IPV6_UNICAST_ADDPATH */
+#define BGPDUMP_SUBTYPE_TABLE_DUMP_V2_RIB_IPV6_MULTICAST_ADDPATH  11   /* RIB_IPV6_MULTICAST_ADDPATH */
+#define BGPDUMP_SUBTYPE_TABLE_DUMP_V2_RIB_GENERIC_ADDPATH         12   /* RIB_GENERIC_ADDPATH */
 
 /* BGP state - defined in RFC1771 */
 #define BGP_STATE_IDLE		1
@@ -304,6 +337,7 @@ typedef struct struct_BGPDUMP_MRTD_TABLE_DUMP {
     u_int16_t		attr_len;
 } BGPDUMP_MRTD_TABLE_DUMP;
 
+
 typedef struct struct_BGPDUMP_TABLE_DUMP_V2_PEER_INDEX_TABLE_ENTRY {
     u_char              afi;
     BGPDUMP_IP_ADDRESS  peer_ip;
@@ -321,6 +355,7 @@ typedef struct struct_BGPDUMP_TABLE_DUMP_V2_PEER_INDEX_TABLE {
 typedef struct struct_BGPDUMP_TABLE_DUMP_V2_ROUTE_ENTRY {
     uint16_t            peer_index;
     uint32_t            originated_time;
+    pathid_t            path_id;
     BGPDUMP_TABLE_DUMP_V2_PEER_INDEX_TABLE_ENTRY *peer;
     attributes_t        *attr;
 } BGPDUMP_TABLE_DUMP_V2_ROUTE_ENTRY;
@@ -450,6 +485,7 @@ typedef union union_BGPDUMP_BODY {
 /* The MRT header. Common to all records. */
 typedef struct struct_BGPDUMP_ENTRY {
     time_t		time;
+    long		ms;
     u_int16_t		type;
     u_int16_t		subtype;
     u_int32_t		length;
@@ -457,8 +493,15 @@ typedef struct struct_BGPDUMP_ENTRY {
     BGPDUMP_BODY 	body;
 } BGPDUMP_ENTRY;
 
+// bgpdump_lib.h //////////////////////////////////////////////////////////////
+
 #define BGPDUMP_MAX_FILE_LEN	1024
 #define BGPDUMP_MAX_AS_PATH_LEN	2000
+
+// if you include cfile_tools.h, include it first
+//#ifndef _CFILE_TOOLS_DEFINES
+//typedef struct _CFRFILE CFRFILE;
+//#endif
 
 typedef struct struct_BGPDUMP {
     CFRFILE	*f;
@@ -467,6 +510,7 @@ typedef struct struct_BGPDUMP {
     char	filename[BGPDUMP_MAX_FILE_LEN];
     int		parsed;
     int		parsed_ok;
+    BGPDUMP_TABLE_DUMP_V2_PEER_INDEX_TABLE *table_dump_v2_peer_index_table;
 } BGPDUMP;
 
 /* prototypes */
@@ -475,12 +519,12 @@ BGPDUMP *bgpdump_open_dump(const char *filename);
 void	bgpdump_close_dump(BGPDUMP *dump);
 BGPDUMP_ENTRY*	bgpdump_read_next(BGPDUMP *dump);
 void	bgpdump_free_mem(BGPDUMP_ENTRY *entry);
-
-char *bgpdump_version(void);
+char    *bgpdump_version(void);
+int     is_addpath(BGPDUMP_ENTRY *entry);
 '''
 
-class CConst:
 
+class CConst:
     # type and subtypes values - defined in RFC6396
     BGPDUMP_TYPE_MRTD_BGP = 5
     BGPDUMP_SUBTYPE_MRTD_BGP_NULL = 0
@@ -512,12 +556,24 @@ class CConst:
 
     # Zebra record types
     BGPDUMP_TYPE_ZEBRA_BGP = 16
+    BGPDUMP_TYPE_ZEBRA_BGP_ET = 17
     BGPDUMP_SUBTYPE_ZEBRA_BGP_STATE_CHANGE = 0
     BGPDUMP_SUBTYPE_ZEBRA_BGP_MESSAGE = 1
     BGPDUMP_SUBTYPE_ZEBRA_BGP_ENTRY = 2
     BGPDUMP_SUBTYPE_ZEBRA_BGP_SNAPSHOT = 3
     BGPDUMP_SUBTYPE_ZEBRA_BGP_MESSAGE_AS4 = 4
     BGPDUMP_SUBTYPE_ZEBRA_BGP_STATE_CHANGE_AS4 = 5
+    BGPDUMP_SUBTYPE_ZEBRA_BGP_MESSAGE_LOCAL = 6
+    BGPDUMP_SUBTYPE_ZEBRA_BGP_MESSAGE_AS4_LOCAL = 7
+    BGPDUMP_SUBTYPE_ZEBRA_BGP_MESSAGE_ADDPATH = 8
+    BGPDUMP_SUBTYPE_ZEBRA_BGP_MESSAGE_AS4_ADDPATH = 9
+    BGPDUMP_SUBTYPE_ZEBRA_BGP_MESSAGE_LOCAL_ADDPATH = 10
+    BGPDUMP_SUBTYPE_ZEBRA_BGP_MESSAGE_AS4_LOCAL_ADDPATH = 11
+    BGPDUMP_SUBTYPE_TABLE_DUMP_V2_RIB_IPV4_UNICAST_ADDPATH = 8
+    BGPDUMP_SUBTYPE_TABLE_DUMP_V2_RIB_IPV4_MULTICAST_ADDPATH = 9
+    BGPDUMP_SUBTYPE_TABLE_DUMP_V2_RIB_IPV6_UNICAST_ADDPATH = 10
+    BGPDUMP_SUBTYPE_TABLE_DUMP_V2_RIB_IPV6_MULTICAST_ADDPATH = 11
+    BGPDUMP_SUBTYPE_TABLE_DUMP_V2_RIB_GENERIC_ADDPATH = 12
 
     # BGP state - defined in RFC1771
     BGP_STATE_IDLE = 1
@@ -528,7 +584,7 @@ class CConst:
     BGP_STATE_ESTABLISHED = 6
 
     # BGP message types */
-    BGP_MSG_OPEN =  1
+    BGP_MSG_OPEN = 1
     BGP_MSG_UPDATE = 2
     BGP_MSG_NOTIFY = 3
     BGP_MSG_KEEPALIVE = 4
@@ -560,9 +616,10 @@ class CConst:
     BGP_ATTR_EXT_COMMUNITIES = 16
     BGP_ATTR_NEW_AS_PATH = 17
     BGP_ATTR_NEW_AGGREGATOR = 18
+    BGP_ATTR_LARGE_COMMUNITIES = 32
 
     # Flag macro
-    ATTR_FLAG_BIT = lambda(X): (1 << ((X) - 1))
+    ATTR_FLAG_BIT = lambda X: (1 << ((X) - 1))
 
     # BGP ASPATH attribute defines
     AS_HEADER_SIZE = 2
@@ -579,7 +636,7 @@ class CConst:
     COMMUNITY_NO_EXPORT_SUBCONFED = 0xFFFFFF03
     COMMUNITY_LOCAL_AS = 0xFFFFFF03
 
-    COM_NTHVAL = lambda(X,n): (X.val + (n))
+    COM_NTHVAL = lambda X, n: (X.val + (n))
 
     # MP-BGP address families
     AFI_IP = 1
