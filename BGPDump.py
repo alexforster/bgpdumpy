@@ -208,7 +208,12 @@ class TableDumpV2PeerIndexTableEntry:
 
     @property
     def peerIP(self):
-        return self.entry.peer_ip
+
+        if self.afi == AF_INET:
+            return inet_ntop(AF_INET, self.bgp.ffi.buffer(self.bgp.ffi.addressof(self.entry.peer_ip.v4_addr))[:])
+
+        if self.afi == AF_INET6:
+            return inet_ntop(AF_INET6, self.bgp.ffi.buffer(self.bgp.ffi.addressof(self.entry.peer_ip.v6_addr))[:])
 
     @property
     def peerRouterID(self):
