@@ -12,7 +12,7 @@ from setuptools import setup
 from setuptools.command.install_lib import install_lib as install_lib
 
 PACKAGE_NAME = 'bgpdumpy'
-PACKAGE_VERSION = '1.1.1'
+PACKAGE_VERSION = '1.1.2'
 
 
 class custom_install_lib(install_lib):
