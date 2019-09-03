@@ -217,7 +217,7 @@ class TableDumpV2PeerIndexTableEntry:
 
     @property
     def peerRouterID(self):
-        return self.entry.peer_bgp_id
+        return inet_ntop(AF_INET, self.bgp.ffi.buffer(self.bgp.ffi.addressof(self.entry.peer_bgp_id))[:])
 
     @property
     def peerAS(self):
