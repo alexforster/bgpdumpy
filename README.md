@@ -21,7 +21,6 @@
 ### Example
 
 ```python
-import re
 from bgpdumpy import BGPDump, TableDumpV2
 
 with BGPDump('latest-bview.gz') as bgp:
@@ -36,13 +35,13 @@ with BGPDump('latest-bview.gz') as bgp:
 
         # get a list of each unique originating ASN for this prefix
         originatingASs = set([
-            re.split(r'\s+', route.attr.asPath)[-1]
+            route.attr.asPath.split()[-1]
             for route
             in entry.body.routeEntries])
 
         # just print it for demonstration purposes
         print('%s -> %s' % (prefix, '/'.join(originatingASs)))
-        
+
 # 1.0.0.0/24 -> 15169
 # 1.0.4.0/24 -> 56203
 # 1.0.5.0/24 -> 56203
