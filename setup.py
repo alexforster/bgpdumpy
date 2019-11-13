@@ -12,7 +12,7 @@ from setuptools import setup
 from setuptools.command.install_lib import install_lib as install_lib
 
 PACKAGE_NAME = 'bgpdumpy'
-PACKAGE_VERSION = '1.1.2'
+PACKAGE_VERSION = '1.1.3'
 
 
 class custom_install_lib(install_lib):
@@ -37,7 +37,7 @@ setup(
     maintainer='Alex Forster',
     maintainer_email='alex@alexforster.com',
     url='https://github.com/AlexForster/bgpdumpy',
-    description='A Python CFFI wrapper for analyzing MRTv1 and MRTv2 BGP table dump files',
+    description='A libbgpdump Python CFFI wrapper for analyzing MRTv1 and MRTv2 BGP table dump files',
     license='3-Clause ("New") BSD license',
     download_url='https://pypi.python.org/pypi/bgpdumpy',
     zip_safe=False,
